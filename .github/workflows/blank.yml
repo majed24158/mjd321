@@ -1,0 +1,34 @@
+name: Build MPC-HC
+
+# تحديد متى سيتم تشغيل الـ action
+on:
+  push:
+    branches:
+      - main   # عند كل دفع تغييرات لفرع 'main'
+  pull_request:
+    branches:
+      - main   # أو عند تقديم طلبات السحب (Pull Requests)
+
+jobs:
+  build:
+    runs-on: windows-latest  # استخدام بيئة Windows
+
+    steps:
+    # خطوة: استنساخ المشروع
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    # خطوة: تثبيت أدوات Visual Studio
+    - name: Set up Visual Studio
+      uses: microsoft/setup-msbuild@v1
+
+    # خطوة: بناء المشروع باستخدام msbuild
+    - name: Build MPC-HC
+      run: msbuild /p:Configuration=Release mpc-hc.sln
+
+    # خطوة: أرشفة الملفات التنفيذية الناتجة
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: mpc-hc-build
+        path: '**/bin/Release/*'  # المسار الذي يحتوي على الملفات التنفيذية
